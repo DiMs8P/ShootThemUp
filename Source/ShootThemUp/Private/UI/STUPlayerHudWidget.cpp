@@ -1,6 +1,7 @@
 #include "UI/STUPlayerHudWidget.h"
 #include "Components/STUHealthComponent.h"
 #include "Components/STUWeaponComponent.h"
+#include "STUUtils.h"
 
 bool USTUPlayerHudWidget::Initialize()
 {

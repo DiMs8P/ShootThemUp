@@ -46,11 +46,22 @@ APlayerController* ASTUBaseWeapon::GetPlayerController() const
 
 bool ASTUBaseWeapon::GetPlayerViewPoint(FVector& ViewLocation, FRotator& ViewRotation) const
 {
-    const auto Controller = GetPlayerController();
-    if (!Controller)
-        return false;
+    const auto STUCharacter = Cast<ACharacter>(GetOwner());
 
-    Controller->GetPlayerViewPoint(ViewLocation, ViewRotation);
+    if (STUCharacter->IsPlayerControlled())
+    {
+        const auto Controller = GetPlayerController();
+        if (!Controller)
+            return false;
+
+        Controller->GetPlayerViewPoint(ViewLocation, ViewRotation);
+    }
+    else
+    {
+        ViewLocation = GetMuzzleLocation();
+        ViewRotation = WeaponMesh->GetSocketRotation(SocketName);
+    }
+
     return true;
 }
 
@@ -174,9 +185,9 @@ bool ASTUBaseWeapon::IsAmmoFull() const
 UNiagaraComponent* ASTUBaseWeapon::SpawnMuzzleFX()
 {
     return UNiagaraFunctionLibrary::SpawnSystemAttached(MuzzleFX, //
-        WeaponMesh,                                        //
-        SocketName,                                        //
-        FVector::ZeroVector,                               //
-        FRotator::ZeroRotator,//
+        WeaponMesh,                                               //
+        SocketName,                                               //
+        FVector::ZeroVector,                                      //
+        FRotator::ZeroRotator,                                    //
         EAttachLocation::SnapToTarget, true);
 }

@@ -52,8 +52,9 @@ protected:
     UPROPERTY(EditDefaultsOnly, Category = "Damage")
     FVector2D LandedDamage = FVector2D(10.0f, 100.0f);
 
-public:
+    virtual void OnDeath();
 
+public:
     UFUNCTION(BlueprintCallable, Category = "Movement")
     bool IsRunning() const;
 
@@ -76,9 +77,7 @@ private:
     bool WantsToRun = false;
     bool IsMovingForward = false;
 
-    void OnDeath();
     void OnHealthChanged(float Health, float HealthDelta);
-
 
     UFUNCTION()
     void OnGroundLanded(const FHitResult& Hit);

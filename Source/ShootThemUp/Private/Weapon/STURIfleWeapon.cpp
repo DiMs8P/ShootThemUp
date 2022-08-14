@@ -33,7 +33,7 @@ void ASTURIfleWeapon::StopFire()
 
 void ASTURIfleWeapon::MakeShot()
 {
-    if (!GetWorld() || IsAmmoEmpty())
+    if (!GetWorld() || IsAmmoEmpty()) // IsAmmoEmpty()
     {
         return;
         StopFire();

@@ -9,8 +9,6 @@
 
 class ASTUBaseWeapon;
 
-
-
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class SHOOTTHEMUP_API USTUWeaponComponent : public UActorComponent
 {
@@ -22,7 +20,7 @@ public:
 
     virtual void StartFire();
     virtual void StopFire();
-    void NextWeapon();
+    virtual void NextWeapon();
     void Reload();
 
     bool GetCurrentWeaponUI(FWeaponUI& WeaponUI) const;
@@ -30,6 +28,7 @@ public:
     bool GetCurrentWeaponAmmoInfo(FAmmoData& AmmoInfo) const;
 
     bool TryToAddAmmo(TSubclassOf<ASTUBaseWeapon> WeaponType, int32 ClipsAmount);
+    bool NeedAmmo(TSubclassOf<ASTUBaseWeapon> WeaponType);
 
 protected:
     // Called when the game starts
@@ -48,24 +47,27 @@ protected:
     UPROPERTY(EditDefaultsOnly, Category = "Animation")
     UAnimMontage* EquipAnimMontage;
 
-private:
     UPROPERTY()
     ASTUBaseWeapon* CurrentWeapon = nullptr;
 
     UPROPERTY()
     TArray<ASTUBaseWeapon*> Weapons;
 
+    bool CanFire() const;
+    bool CanEquip() const;
+
+    void EquipWeapons(int32 WeaponIndex);
+    int32 CurrentWeaponIndex = 0;
+
+private:
     UPROPERTY()
     UAnimMontage* CurrentReloadAnimMontage = nullptr;
 
-    int32 CurrentWeaponIndex = 0;
     bool EquipAnimInProgress = false;
     bool ReloadAnimInProgress = false;
 
     void SpawnWeapons();
-
     void AttachWeaponToSocket(ASTUBaseWeapon* Weapon, USceneComponent* SceneComponent, const FName& SocketName);
-    void EquipWeapons(int32 WeaponIndex);
 
     void PlayAnimMontage(UAnimMontage* Animation);
     void InitAnimation();
@@ -73,12 +75,8 @@ private:
     void OnEquipFinished(USkeletalMeshComponent* MeshComp);
     void OnReloadFinished(USkeletalMeshComponent* MeshComp);
 
-    bool CanFire() const;
-    bool CanEquip() const;
     bool CanReload() const;
-
     void ChangeClip();
     void OnEmptyClip(ASTUBaseWeapon* AmmoEmptyWeapon);
-
 
 };
