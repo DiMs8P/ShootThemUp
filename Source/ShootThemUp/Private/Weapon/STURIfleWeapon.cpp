@@ -57,14 +57,9 @@ void ASTURIfleWeapon::MakeShot()
     {
         TraceFXEnd = HitResult.ImpactPoint;
         MakeDamage(HitResult);
-        // DrawDebugLine(GetWorld(), GetMuzzleLocation(), HitResult.ImpactPoint, FColor::Blue, false, 3.0f, 0, 3.0f);
-        // DrawDebugSphere(GetWorld(), HitResult.ImpactPoint, 10.0f, 24, FColor::Black, false, 5.0f);
         WeaponFXComponent->PlayImpactFX(HitResult);
     }
-    //else
-    //{
-    //    // DrawDebugLine(GetWorld(), GetMuzzleLocation(), EndPosition, FColor::Blue, false, 3.0f, 0, 3.0f);
-    //}
+
     SpawnTraceFX(GetMuzzleLocation(), TraceFXEnd);
     DecreaseAmmo();
 }
@@ -89,10 +84,11 @@ void ASTURIfleWeapon::MakeDamage(const FHitResult HitResult)
     if (!DamagedActor)
         return;
 
-    DamagedActor->TakeDamage(DamageAmount, FDamageEvent(), GetPlayerController(), this);
+    DamagedActor->TakeDamage(DamageAmount, FDamageEvent(), GetController(), this);
 }
 
-void ASTURIfleWeapon::InitMuzzleFX() {
+void ASTURIfleWeapon::InitMuzzleFX()
+{
     if (!MuzzleFXComponent)
     {
         MuzzleFXComponent = SpawnMuzzleFX();
@@ -100,21 +96,26 @@ void ASTURIfleWeapon::InitMuzzleFX() {
     SetMuzzleFXVisibility(true);
 }
 
-void ASTURIfleWeapon::SetMuzzleFXVisibility(bool Visible) {
+void ASTURIfleWeapon::SetMuzzleFXVisibility(bool Visible)
+{
     if (MuzzleFXComponent)
     {
         MuzzleFXComponent->SetPaused(!Visible);
         MuzzleFXComponent->SetVisibility(Visible, true);
     }
-
 }
 
-void ASTURIfleWeapon::SpawnTraceFX(const FVector& TraceStart, const FVector& TraceEnd) {
+void ASTURIfleWeapon::SpawnTraceFX(const FVector& TraceStart, const FVector& TraceEnd)
+{
     const auto TraceFXComponent = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), TraceFX, TraceStart);
     if (TraceFXComponent)
     {
         TraceFXComponent->SetNiagaraVariableVec3(TraceTargetName, TraceEnd);
-    
     }
+}
 
-    }
+AController* ASTURIfleWeapon::GetController() const
+{
+    const auto Pawn = Cast<APawn>(GetOwner());
+    return Pawn ? Pawn->GetController() : nullptr;
+}

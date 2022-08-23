@@ -6,6 +6,7 @@
 #include "BehaviorTree/BTService.h"
 #include "STUFindEnemyService.generated.h"
 
+
 UCLASS()
 class SHOOTTHEMUP_API USTUFindEnemyService : public UBTService
 {

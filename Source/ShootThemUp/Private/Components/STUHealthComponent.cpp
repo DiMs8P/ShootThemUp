@@ -7,6 +7,7 @@
 #include "TimerManager.h"
 #include "Engine/World.h"
 #include "Camera/CameraShakeBase.h"
+#include "Player/STUGameModeBase.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogHealthComponent, All, All)
 
@@ -25,9 +26,6 @@ void USTUHealthComponent::BeginPlay()
 
     SetHealth(MaxHealth);
 
-    /*Health = MaxHealth;
-    OnHealthChanged.Broadcast(Health);*/
-
     AActor* ConponentOwner = GetOwner();
     if (ConponentOwner)
     {
@@ -36,7 +34,7 @@ void USTUHealthComponent::BeginPlay()
 }
 
 void USTUHealthComponent::OnTakeAnyDamage(
-    AActor* DamageActor, float Damage, const class UDamageType* DamageType, class AController* Instigatebly, AActor* DamageCauser)
+    AActor* DamageActor, float Damage, const class UDamageType* DamageType, class AController* InstigateBy, AActor* DamageCauser)
 {
     if (Damage <= 0.0f || IsDead() || !GetWorld())
         return;
@@ -48,6 +46,7 @@ void USTUHealthComponent::OnTakeAnyDamage(
 
     if (IsDead())
     {
+        Killed(InstigateBy);
         OnDeath.Broadcast();
     }
     else if (AutoHeal)
@@ -93,10 +92,11 @@ bool USTUHealthComponent::IsHealthFull() const
     return FMath::IsNearlyEqual(Health, MaxHealth);
 }
 
-void USTUHealthComponent::PlayCameraShake() const {
+void USTUHealthComponent::PlayCameraShake() const
+{
     if (IsDead())
         return;
-    
+
     const auto Player = Cast<APawn>(GetOwner());
     if (!Player)
         return;
@@ -106,4 +106,16 @@ void USTUHealthComponent::PlayCameraShake() const {
         return;
 
     Controller->PlayerCameraManager->StartCameraShake(CameraShake);
+}
+
+void USTUHealthComponent::Killed(AController* KillerController)
+{
+    if (!GetWorld())
+        return;
+    const auto GameMode = Cast<ASTUGameModeBase>(GetWorld()->GetAuthGameMode());
+
+    const auto Player = Cast<APawn>(GetOwner());
+    const auto VictimController = Player ? Player->Controller : nullptr;
+
+    GameMode->Killed(KillerController, VictimController);
 }
